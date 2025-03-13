@@ -4,7 +4,7 @@
 
 OpenAI's Operator is a single AI agent called the Computer-Using Agent (CUA) that uses vision and reasoning to do tasks on the web, like a human would. It works alone in a virtual browser, handling everything from start to finish without needing other agents. Unlike multi-agent systems, it’s one AI built to manage it all simply and smoothly.
 
-## Microsoft Omniparser
+## Microsoft OmniParser
 
 Microsoft’s OmniParser is another AI agent framework designed to enhance graphical user interface (GUI) interaction by converting screenshots into structured data that AI models can understand and act upon. It operates as a unified system, using a detection model to identify interactive elements like buttons and icons, and a captioning model to describe their functions, all within a single agent powered by vision and language capabilities. This allows it to autonomously navigate and perform tasks across various platforms, making it a streamlined, standalone tool rather than a multi-agent setup.
 
