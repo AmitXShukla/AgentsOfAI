@@ -1,0 +1,51 @@
+version: 1
+project:
+  title: Agents of AI
+  authors:
+    # - name: Amit Shukla
+  bibliography:
+    - references.bib
+  toc:
+    - file: intro.md
+    - file: content/toc.md
+    - file: content/security.md
+    - file: content/whyautogen.md
+    - title: Use Cases
+      children:
+        - file: content/usecases.md
+        - file: content/moreusecases.md
+    - file: content/LLM.md
+    - title: Tools
+      children:
+        - file: content/tools.md
+        - file: content/moretools.md
+    - file: content/gettingstarted.md
+    - title: AI Agent
+      children:
+        - file: content/agent.md
+        - file: content/actor.md
+        - file: content/usecase.md
+        - file: content/modelruntime.md
+    - title: AutoGen Core
+      children:
+        - file: content/implementation.md
+        - file: content/messages.md
+        - file: content/runtime.md
+        - file: content/lifecycle.md
+        - file: content/messaging.md
+        - file: content/broadcast.md
+    - title: Agent Chat
+      children:
+        - file: content/agentchat.md
+        - file: content/agentchatagent.md
+        - file: content/agentchatmodels.md
+        - file: content/agentchatmessages.md
+        - file: content/agentchatteam.md
+site:
+  title: Agents of AI ~ Hack the Core
+  favicon: "logo.png"
+  options:
+    favicon: "logo.png"
+    logo: "logo.png"
+    footer: x.com/@ashuklax
+  template: book-theme

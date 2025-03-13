@@ -1,0 +1,24 @@
+title: Agents of AI
+author: Amit Shukla
+logo: logo.png
+execute:
+  execute_notebooks: force
+
+# a bibtex file to create citations
+bibtex_bibfiles:
+  - references.bib
+
+parse:
+  myst_enable_extensions:
+    - "dollarmath"
+    - "amsmath"
+    - "deflist"
+    - "html_admonition"
+    - "html_image"
+    - "colon_fence"
+    - "linkify"
+    - "substitution"
+    - "tasklist"
+    - "mermaid"
+  myst_fence_as_directive:
+    - "mermaid"
