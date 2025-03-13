@@ -1,7 +1,0 @@
-format: jb-book
-root: intro
-chapters:
-- file: content/security
-- file: content/whyautogen
-- file: content/usecases
-- file: content/moreusecases
