@@ -1,4 +1,4 @@
-# Team
+# Agent Chat Team
 
 In previous chapters, we learns the based of AutoGen Core.
 If you go through AutoGen official documentation, almost every one recommended to start with AutoGen Agent Chat
