@@ -4,10 +4,10 @@ project:
   authors:
     # - name: Amit Shukla
   bibliography:
-    - references.bib
+    # - references.bib
   github: https://github.com/AmitXShukla/AgentsOfAI
   toc:
-    - file: intro.md
+    - file: content/intro.md
     - file: content/toc.md
     - file: content/security.md
     - file: content/whyautogen.md
@@ -44,10 +44,10 @@ project:
         - file: content/agentchatteam.md
 site:
   title: Agents of AI ~ Hack the Core
-  favicon: "logo.png"
+  favicon: "content/images/logo.png"
   options:
-    favicon: "logo.png"
-    logo: "logo.png"
+    favicon: "content/images/logo.png"
+    logo: "content/images/logo.png"
     footer: x.com/@ashuklax
   template: book-theme
   nav: []

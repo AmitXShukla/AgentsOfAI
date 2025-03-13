@@ -4,7 +4,7 @@
 
 - Author: Amit Shukla
 - x.com/\@ashuklax
-- [license](./license.txt)
+- [license](../license.txt)
 
 Welcome to my Agents of AI book, This book will teach you to code with `Microsoft AutoGen 0.4` to automate boring tasks.
 
@@ -12,4 +12,4 @@ These AI agents can tackle the repetitive, tiring chores you hate, as well as ta
 
 > This starter book is free. If you’d like to help fund intermediate and advanced versions, please consider buying a copy, subscribing to my [YouTube](https://youtube.com/@amit.shukla) channel, following me at [X](https://x.com/@ashuklax) & [GitHub](https://github.com/AmitXShukla).
 
-![Agents of AI](./content/images/logo.png)
+![Agents of AI](./images/logo.png)
