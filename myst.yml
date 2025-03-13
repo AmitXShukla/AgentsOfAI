@@ -5,6 +5,7 @@ project:
     # - name: Amit Shukla
   bibliography:
     - references.bib
+  github: AmitXShukla/AgentsOfAI
   toc:
     - file: intro.md
     - file: content/toc.md
