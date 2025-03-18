@@ -14,7 +14,7 @@ AgentChat is a high-level API for building multi-agent applications. It is built
 
 However, I have news for you, Agent Chat is mostly community driven and using Agent Chat comes with the advantage that it offers so many preset Agent and team configuration that makes it so easy to start with.
 
-One of the most popular multi design pattern `magentic-core` which we will learn in advance topics, was first built in AutoGen Core,
+One of the most popular multi design pattern `Magentic-One` which we will learn in advance topics, was first built in AutoGen Core,
 is a design pattern, which allows users to quickly build and spin a pro use case implementation is now totally re0built using Agent Chat.
 
 So the point is,
@@ -32,7 +32,7 @@ However, our exploration is not complete; there is still much more to learn abou
 
 now, we got our hands on using AutoGen Core, why to even bother learning about AGent Chat,
 Agent Chat provide us many many present Agent Configuration which are ready to use,
-for example, a PDF reader, web crawler, data (get this from `magentic-core` and Agent Chat config)
+for example, a PDF reader, web crawler, data (get this from `Magentic-One` and Agent Chat config)
 
 now since we understand the basic so AI Agents, Messages, topics, subscription, their run time and lifecycle.
 But in fact, this is lot to learn, what if there is some kind of high level abstract of this whole mechanism which can help us get started.
@@ -47,7 +47,7 @@ It;s great and must know about Agent Core, what Agent Core components are, under
 However saying AI Agent Chat is not good enough to build a production level complex Agent framework is not enough, this is not right statement.
 
 AI Agent Chat has evolved so much that it is capable of fully supporting to create an extremely complex business problem or automation.
-Look at the paper `magentic-core`, this design pattern initially was developed in AI Agent Core, but now is fully ported to AI Agent Chat and it does an amazing job.
+Look at the paper `Magentic-One`, this design pattern initially was developed in AI Agent Core, but now is fully ported to AI Agent Chat and it does an amazing job.
 
 but knowledge gained in AI Agent Core is not lost and will always be useful.
 
@@ -68,7 +68,7 @@ and when you need a finer control over your proof of concept, AGent Chat exactly
 Agent Chat provides you some control over your Agents.
 
 However, don't underestimate and think Agent Chat is only capable of a higher level quick POC,
-recently Agent Chat has become so popular and powerful that it is no less than AutoGen Core itself, and just to mention, it's AutoGen most populate design pattern called `megentic-Core` which was also referred a flagship AutoGen0.2 is now completely written using Agent Chat.
+recently Agent Chat has become so popular and powerful that it is no less than AutoGen Core itself, and just to mention, it's AutoGen most populate design pattern called `Magentic-One` which was also referred a flagship AutoGen0.2 is now completely written using Agent Chat.
 
 point is, Agent Chat although being a higher level API on AutoGen Core is fully capable of delivering a great complex use case implementation.
 

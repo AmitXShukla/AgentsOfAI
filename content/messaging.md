@@ -1,21 +1,60 @@
-# Direct Messages
+# Message & Communication
+
+> Messages are purely data, and should not contain any logic.
+
+## Messages
+
+```{mermaid}
+sequenceDiagram
+    %% Adding a background box with light color
+    rect rgba(200, 212, 223, 0.8)
+        participant LLMAgent
+        participant ManagerAgent
+        participant AnotherAgent
+        participant PTOAgent
+        participant TaskAgent
+        LLMAgent->>PTOAgent: request "Available PTO" for Employee 123
+        PTOAgent-->>LLMAgent: respond with 16
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 123
+        PTOAgent-->>ManagerAgent: respond with 16
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 124
+        PTOAgent-->>ManagerAgent: respond with 8
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 125
+        PTOAgent-->>ManagerAgent: respond with 8
+        AnotherAgent->>PTOAgent: request "Available PTO" for Employee 512
+        PTOAgent-->>AnotherAgent: respond with 24
+        ManagerAgent->>TaskAgent: request "Assigned Tasks" for Employee 512
+        TaskAgent-->>ManagerAgent: respond with TaskList
+    end
+```
+
+Suppose, in above use case, `ManagerAgent` needs to check PTO availability and tasks for `Employee ID 512`.
 
 There are two types of communication in AutoGen core:
 
 - Direct Messaging: sends a direct message to another agent.
 - Broadcast: publishes a message to a topic.
 
-Let’s first look at direct messaging. To send a direct message to another agent, within a message handler use the AutoGen core.BaseAgent.send_message() method, from the runtime use the AutoGen _core.AgentRuntime.send_message() method. Awaiting calls to these methods will return the return value of the receiving agent’s message handler. When the receiving agent’s handler returns None, None will be returned.
+For the above use case, sending a `Direct message` to `TaskAgent` and `PTOAgent` to get the details, seems more appropriate.
 
-Note
+## Direct Messages
 
-If the invoked agent raises an exception while the sender is awaiting, the exception will be propagated back to the sender.
+For the said purpose, we can make use of Direct messaging to fetch required information.
+
+There are two primary ways to send a direct message.
+
+- To send a direct message to another agent, while with in a message handler, use `agent.send_message()`.
+- To send a direct message From the runtime, use `runtime.send_message()`.
+
+The method returns the receiving agent's handler value, or None if the handler returns None.
 
 ## Request/Response
 
 Direct messaging can be used for request/response scenarios, where the sender expects a response from the receiver. The receiver can respond to the message by returning a value from its message handler. You can think of this as a function call between agents.
 
-For example, consider the following agents:
+Let's write the code to send `Direct Message` between agents to fetch this information.
+
+>   `ManagerAgent` needs to check PTO availability and tasks for `Employee ID 512`.
 
 ```python
 from dataclasses import dataclass

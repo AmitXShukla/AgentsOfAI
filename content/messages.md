@@ -351,17 +351,17 @@ class TaskAgent(RoutedAgent):
         super().__init__("TaskAgent")
 
     @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_1"))
-    async def on_txt_message_1(self, message: PTOAgentMessages, ctx: MessageContext) -> None:
+    async def on_txt_message_1(self, message: TaskAgentMessages, ctx: MessageContext) -> None:
         # fetches tasks an employee
         print(f"{self.id.type} received message: {message.content} from : {message.source}")
     
     @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_2"))
-    async def on_txt_message_2(self, message: PTOAgentMessages, ctx: MessageContext) -> None:
+    async def on_txt_message_2(self, message: TaskAgentMessages, ctx: MessageContext) -> None:
         # poeple working on one task 
         print(f"{self.id.type} received message: {message.content} from : {message.source}")
     
     @message_handler
-    async def on_doc_message(self, message: PTOAgentImageMessages, ctx: MessageContext) -> None:
+    async def on_doc_message(self, message: TaskAgentImageMessages, ctx: MessageContext) -> None:
         # fetch all other teams working on same tasks and their PTO during same period
         print(f"{self.id.type} received message: {message.url} from : {message.source}")
 ```

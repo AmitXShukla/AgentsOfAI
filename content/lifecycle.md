@@ -1,62 +1,169 @@
 # Agent Lifecyle
 
-## Agent ID and LifeCycle
-In last chapter we learned about messages, how using messages works well in case of we want to pass along different messages among different agents, with in same or distributed compute environment.
+In the previous chapter, we explored agents, messages, high level concept of runtime and how they effectively enable the passing of different type of messages between agents within the same or a distributed computing environment.
 
-another important concept here is Agent ID.
-What exactly is an Agent ID?
+We explored the `runtime` environment, a system that lets programs run and supports AI agents designed with the `actor` model. We also built an example agent called `PTOAgent` and defined the `runtime` in our code. Below is a snippet of that code.
 
-now since we defined Agent definitions and their abilities to handle different `type` of handles, now we need to build a mechanism which helps manage Agent life cycle, what that means, just like mentioned in previous code, we register agents to a run time environment, means, we attach agents to a run time environment based on assumption that since there may be thousands of agents, let;s leave invoking of Agents as per needed basis, and let run time alone create, maintain, remove Agent ID from runtime for efficiency.
+```python
+## snippet of the code
+## PTO Agent Actor model
 
-but how will a run time locate an Agent?
+from autogen_core import RoutedAgent
+class PTOAgent(RoutedAgent):
+    def __init__(self) -> None:
+        super().__init__("myPTOAgent")
+    @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_1"))
+        async def on_txt_message_1(self, message: PTOAgentMessages, ctx: MessageContext) -> None:
+            # fetches available PTO for a given employee
+            ## added agent ID
+            print(f"{self.id.type} received message: {message.content} from : {message.source}")
+...
+...
+...
+## A runtime
+from autogen_core import SingleThreadedAgentRuntime
+runtime = SingleThreadedAgentRuntime()
+```
 
-we want to use Agent ID.
+This code imports the `RoutedAgent` class from `autogen_core` and defines a new `PTOAgent` class that inherits from it, initializing it with the name `myPTOAgent`.
 
-## Agent ID
-Agent ID uniquely identifies an agent instance within an agent runtime – including distributed runtime. It is the “address” of the agent instance for receiving messages. It has two components: agent type and agent key.
+## Register an Agent
 
-Agent ID = (Agent Type, Agent Key)
+```python
+from autogen_core import SingleThreadedAgentRuntime
+runtime = SingleThreadedAgentRuntime()
+```
+This code imports a `SingleThreadedAgentRuntime` class from the `autogen_core` module and creates a runtime instance that manages agents in a single-threaded environment.
+
+Let's attach (or `register`) the `PTOAgent` to this `runtime`.
+
+```python
+## bad code
+runtime.register("PTOAgent")
+```
+
+However, In a real-life situation, I can see multiple agents, like `LLMAgent`, `ManagerAgent`, or `AnotherAgent`, using this `PTOAgent` for various tasks, such as checking PTO availability for different employees.
+
+```{mermaid}
+sequenceDiagram
+    %% Adding a background box with light color
+    rect rgba(200, 212, 223, 0.8)
+        participant LLMAgent
+        participant ManagerAgent
+        participant AnotherAgent
+        participant PTOAgent
+        participant TaskAgent
+        LLMAgent->>PTOAgent: request "Available PTO" for Employee 123
+        PTOAgent-->>LLMAgent: respond with 16
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 123
+        PTOAgent-->>ManagerAgent: respond with 16
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 124
+        PTOAgent-->>ManagerAgent: respond with 8
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 125
+        PTOAgent-->>ManagerAgent: respond with 8
+        AnotherAgent->>PTOAgent: request "Available PTO" for Employee 512
+        PTOAgent-->>AnotherAgent: respond with 24
+        ManagerAgent->>TaskAgent: request "Assigned Tasks" for Employee 512
+        TaskAgent-->>ManagerAgent: respond with TaskList
+    end
+```
+
+How does registering an agent (using code `runtime.register("PTOAgent")`) with a runtime solve this? We need one `PTOAgent` that other agents can call repeatedly.
+If it’s not needed, it just stays idle.
 
 ## Agent Type
 
-Agent Type is nothing but a type definition to define and Agent Identity.
+If you want to reuse an agent like `PTOAgent` for various tasks without registering it repeatedly (e.g., `runtime.register("PTOAgent")` for each use), you can register an AgentType instead. This approach is more efficient and flexible.
 
-just like when we were dealing with messages in previous chapter, we took advantage of Type definition.
-similar to defining Message Type to take advantage of Message protocols, interfaces, Type definitions used in message handler decorator and message context object
+Agent Type is not same as Agent class. In this above example, `PTOAgent` is an Agent class (Python class), initializing it with the name `myPTOAgent`.
 
-The agent type is not an agent class. It associates an agent with a specific factory function, which produces instances of agents of the same agent type. For example, different factory functions can produce the same agent class but with different constructor parameters. The agent key is an instance identifier for the given agent type. Agent IDs can be converted to and from strings. the format of this string is:
+**So what is the Agent Type?**
 
+Again, The agent type is not an agent class. It associates an agent with a specific factory function, which produces instances of agents of the same agent type.
 
-Types and Keys are considered valid if they only contain alphanumeric letters (a-z) and (0-9), or underscores (_). A valid identifier cannot start with a number, or contain any spaces.
+The job of Agent Type is to provide an instance of Python Agent class given a specific functions, this way, we can create many instance of same Agent Type.
 
-In a multi-agent application, agent types are typically defined directly by the application, i.e., they are defined in the application code. On the other hand, agent keys are typically generated given messages delivered to the agents, i.e., they are defined by the application data.
+## `AgentType`: A Clearer Explanation
+### Key Concepts
+- **Agent Class**: A Python class that defines what an agent does. For example:
+  ```python
+  class PTOAgent:
+      def handle_pto(self):
+          print("Processing PTO request")
+  ```
+  You can create an instance of it, like `myPTOAgent = PTOAgent()`.
 
-For example, a runtime has registered the agent type "code_reviewer" with a factory function producing agent instances that perform code reviews. Each code review request has a unique ID review_request_id to mark a dedicated session. In this case, each request can be handled by a new instance with an agent ID, ("code_reviewer", review_request_id).
+- **Agent Instance**: A specific object made from the agent class (e.g., `myPTOAgent`).
+
+- **Agent Type**: A factory function that creates instances of the agent class. It’s not the class itself but a way to produce agents on demand. For example:
+  ```python
+  def create_pto_agent():
+      return PTOAgent()
+  ```
+
+### What’s the Point of `AgentType`?
+Instead of registering every agent instance individually (e.g., `runtime.register(myPTOAgent)`), you register the `AgentType`—the factory function. The runtime can then call this function whenever it needs a new agent of that type. This makes it easy to create multiple agents of the same kind without redundant registrations.
+
+### Example in Action
+Here’s how it works:
+```python
+# Define the agent class
+class PTOAgent:
+    def handle_pto(self):
+        print("Processing PTO request")
+
+# Define the factory function (AgentType)
+def create_pto_agent():
+    return PTOAgent()
+
+# Register the AgentType once
+runtime.register_agent_type("PTOAgentType", create_pto_agent)
+
+# Runtime creates agents as needed
+agent1 = runtime.get_agent("PTOAgentType")  # New PTOAgent instance
+agent2 = runtime.get_agent("PTOAgentType")  # Another PTOAgent instance
+
+agent1.handle_pto()  # Output: Processing PTO request
+agent2.handle_pto()  # Output: Processing PTO request
+```
+
+### Why It’s Better
+- **Reusability**: One registration covers all instances of that agent type.
+- **Flexibility**: The factory function can be customized (e.g., adding parameters):
+  ```python
+  def create_pto_agent(user_id):
+      return PTOAgent(user_id=user_id)
+  ```
+
+### Summary
+The `AgentType` is a factory function that produces agent instances, not the agent class itself. By registering an `AgentType`, you let the runtime generate as many agents as needed from a single registration—way simpler than registering each one by hand!
+
+## Agent ID and LifeCycle
+
+Final key concept introduced here is to put altogether, Agent, Agent Type, Agent ID and Agent Lifecycle.
+
+Agent Types helps us create instances of an Agent Type, but how do we really associate a give Agent Type to a `runtime` to manage specific query requests from specific agents.
+
+## Agent ID
+Agent ID uniquely identifies an agent instance within an agent runtime – including distributed runtime. 
+
+It is the “address” of the agent instance for receiving messages. 
+
+It has two components: agent type and agent key.
+
+> Agent ID = (Agent Type, Agent Key)
+
+## Agent Key
+
+The agent key is an instance identifier for the given agent type
 
 ## Agent Lifecycle
 
-just for the reference, here is a diagram (ref: [AutoGen Documentation](https://microsoft.github.io/autogen/stable/user-guide/core-user-guide/core-concepts/agent-identity-and-lifecycle.html)) showing Agent Lifecycle.
-
-![Agent Lifecycle](https://microsoft.github.io/autogen/stable/_images/agent-lifecycle.svg)
+![Agent Lifecycle](./images/agentregister.svg)
 
 ## Registering Agents
 
-
-To make agents available to the runtime, developers can use the register() class method of the BaseAgent class. The process of registration associates an agent type, which is uniquely identified by a string, and a factory function that creates an instance of the agent type of the given class. The factory function is used to allow automatic creation of agent instances when they are needed.
-
-Agent type (AgentType) is not the same as the agent class. In this example, the agent type is AgentType("my_agent") or AgentType("my_assistant") and the agent class is the Python class MyAgent or MyAssistantAgent. The factory function is expected to return an instance of the agent class on which the register() class method is invoked. Read Agent Identity and Lifecycles to learn more about agent type and identity.
-
-```{note} note
-just if you are wondering why we learned so much detail about Agent ID and Lifecycle is, because of sole reason that, Same Agents can br used across same or different runtime just by making use of different agent Type.
-
-a Typical Agent ID  AgentType, key will help distinguish a specific instance of a given Agent invoke in a runtime, hence the reusability with going through complex OOPs encapdulation, inheritance and abstraction concepts.
-
-Different agent types can be registered with factory functions that return the same agent class. For example, in the factory functions, variations of the constructor parameters can be used to create different instances of the same agent class.
-```
-
-To register our agent types with the SingleThreadedAgentRuntime, the following code can be used:
-
-so based on this `register()` signature, it's important to register an Agent appropriately so that runtime would be able to invoke this Agent when needed.
+The final agent `register` code creates a unique ID for the agent to send and receive messages in the `runtime`.
 
 ```python
 from autogen_core import SingleThreadedAgentRuntime
@@ -70,12 +177,22 @@ await TaskAgent.register(runtime, "ERP_Task_Agent", lambda: TaskAgent("T_E_TaskA
 ```
 
 ```{seealso} result
-    AgentType(type='my_assistant')
+    AgentType(type='PTOAgent')
+    AgentType(type='TaskAgent')
 ```
 
-Once an agent type is registered, we can send a direct message to an agent instance using an AgentId. The runtime will create the instance the first time it delivers a message to this instance.
+```{note} note
+Why learn about Agent ID and Lifecycle in so much detail?
+
+Because the same agent can be reused across runtimes using different Agent Types. 
+
+An Agent ID and Type key identifies a specific instance in a runtime, enabling reuse without complex OOP concepts like encapsulation or inheritance. 
+
+Different Agent Types can use factory functions with varied parameters to create distinct instances of the same agent class.
+```
 
 ## Executing Runtime
+After registering an agent, you can message an `Agent` instance using its `AgentId`, and the `runtime` creates the instance on the first `message` delivery.
 
 ```python
 runtime.start()  # Start processing messages in the background.
@@ -89,7 +206,6 @@ await runtime.stop()  # Stop processing messages in the background.
     my_assistant received message: Hello, World!
     my_assistant responded: Hello! How can I assist you today?
 ```
-
 
 ```python
 # This will block until the runtime is idle
