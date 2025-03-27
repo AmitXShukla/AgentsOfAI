@@ -2,11 +2,11 @@
 
 In earlier chapters, we covered the basics of `AutoGen Core`.
 
-The official AutoGen documentation suggests starting with AutoGen `AgentChat`. You might wonder why I focused on `AutoGen Core` first, especially when we were close to finishing the HR TimeSheet automation use case, only to switch to `AgentChat`.
+The official AutoGen documentation suggests starting with AutoGen `AgentChat`. You might wonder why I focused on `AutoGen Core` first. And now, especially when we were close to finishing the HR TimeSheet automation use case, only to switch to `AgentChat`.
 
 The reason is simple: understanding `AutoGen Core` is essential for building professional AI Agent applications. It’s the foundation you need to become a skilled AI Agent Engineer.
 
-Now, let’s dive into `AgentChat`.
+Let’s dive into `AgentChat`.
 
 ```{note}
 why learn AgentChat?
@@ -14,7 +14,7 @@ why learn AgentChat?
 `AgentChat` provides intuitive defaults, such as Agents with preset behaviors and Teams with predefined multi-agent design patterns.
 ```
 
-`AgentChat` is a simple, high-level API for creating multi-agent apps, built on top of `AutoGen core`. It’s great for beginners, while advanced users can use AutoGen-core’s event-driven model for more control. Here’s the thing: `AgentChat` is largely community-driven and comes with many ready-made Agent and team setups, making it super easy to start.
+`AgentChat` is a simple, high-level API for creating multi-agent apps, built on top of `AutoGen core`. It’s great for beginners, while advanced users can use AutoGen-core’s event-driven model for more control. Here’s the thing: `AgentChat` is largely community-driven and comes with many ready-made Agent and team setups, making it super easy to start with.
 
 One popular design pattern, `Magentic-One`, which we’ll cover later, was originally built in `AutoGen Core 0.2`. It helps users quickly create professional use cases. Now, it’s been fully rebuilt in `AgentChat`.
 
@@ -31,6 +31,9 @@ However, Don’t think `AgentChat` is just for quick, high-level proofs of conce
 ![AgentChat](https://github.com/microsoft/autogen/raw/main/autogen-landing.jpg)
 
 ## Getting started with AgentChat
+
+This is an example script from the AutoGen Documentation designed to help you quickly begin using the AutoGen `AgentChat` API. In the following chapters, we will explore this API in greater depth.
+
 ```python
 pip install -U "autogen-agentchat" "autogen-ext[openai,azure]"
 ```

@@ -9,7 +9,42 @@ Currently, our agentic framework solution design includes the following agents:
 - TaskAgent
 - LLMAgent
 - ManagerAgent
+- HRAgent
 - BroadcasterAgent
+
+`Solution Design : Implementation`
+
+```{mermaid}
+sequenceDiagram
+%% Adding a background box with light color
+    rect rgba(200, 212, 223, 0.8)
+        participant User
+        participant LLMAgent
+        participant PTOAgent
+        participant TaskAgent
+        participant HRAgent
+        participant DecisionAgent
+        participant ManagerAgent
+
+        User->>LLMAgent: PTO request (e.g., for Alice, ID:512, next Thu-Fri)
+        LLMAgent-->>LLMAgent: Identify dates and employee ID
+        LLMAgent->>PTOAgent: Send employee ID and dates
+        LLMAgent->>TaskAgent: Send employee ID and dates
+        PTOAgent->>HRAgent: Check sick leave rules
+        HRAgent-->>PTOAgent: Return policy info
+        PTOAgent->>DecisionAgent: Send PTO info
+        LLMAgent->>DecisionAgent: Send request details
+        DecisionAgent-->>DecisionAgent: Process information
+        alt Auto-approve
+            DecisionAgent->>User: PTO approved
+        else Send to manager
+            DecisionAgent->>ManagerAgent: Forward PTO request
+            ManagerAgent-->>ManagerAgent: Make decision
+            ManagerAgent->>DecisionAgent: Return decision
+            DecisionAgent->>User: PTO decision
+        end
+    end
+```
 
 Each agent exhibits specific behaviors in response to tasks. However, this design is not final, and we may need to add, update, or remove agents as the project progresses.
 
@@ -35,7 +70,7 @@ class PTOAgentMessages: ## add dataclass to support message data types
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPPTOAgent")
 
     def do_something(self, message: PTOAgentMessages) -> None:  ## add type def
         # fetches available PTO for a given employee
@@ -63,7 +98,7 @@ class PTOAgentImageMessages:
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPPTOAgent")
 
     def do_something(self, message: PTOAgentMessages) -> None:
         # fetches available PTO for a given employee
@@ -96,7 +131,7 @@ class PTOAgentImageMessages:
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPPTOAgent")
 
     def do_something(self, message: PTOAgentMessages) -> None:
         # fetches available PTO for a given employee
@@ -131,7 +166,7 @@ class PTOAgentImageMessages:
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPPTOAgent")
 
     def on_txt_message_1(self, message: PTOAgentMessages) -> None: ## rename method
         # fetches available PTO for a given employee
@@ -168,11 +203,11 @@ class PTOAgentImageMessages:
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPPTOAgent")
 
 ## Refactor code to act on message Type def
     def on_txt_messages(self, message: PTOAgentMessages):
-        if message.source.startswith("Agent_1"):
+        if message.source.startswith("Manager"):
             def on_txt_message_1(self, message: PTOAgentMessages) -> None:
                 # fetches available PTO for a given employee
                 print(f"received message: {message.content} from : {message.source}")
@@ -213,11 +248,11 @@ class PTOAgentImageMessages:
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPPTOAgent")
 
     @message_handler ## add async
     async def on_txt_messages(self, message: PTOAgentMessages): ## add async
-        if message.source.startswith("Agent_1"):
+        if message.source.startswith("Manager"):
             async def on_txt_message_1(self, message: PTOAgentMessages) -> ## add async
                 # fetches available PTO for a given employee
                 print(f"received message: {message.content} from : {message.source}")
@@ -256,17 +291,17 @@ class PTOAgentImageMessages:
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPPTOAgent")
 
     ## add message type handler using match
-    @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_1"))
+    @message_handler(match=lambda msg, ctx: msg.source.startswith("Manager"))
     ## add message context
     async def on_txt_message_1(self, message: PTOAgentMessages, ctx: MessageContext) -> None:
         # fetches available PTO for a given employee
         print(f"received message: {message.content} from : {message.source}")
     
     ## add message type handler using match
-    @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_2"))
+    @message_handler(match=lambda msg, ctx: msg.source.startswith("Employee"))
     ## add message context
     async def on_txt_message_2(self, message: PTOAgentMessages, ctx: MessageContext) -> None:
         # udpate PTO for a given employee if approved
@@ -299,15 +334,15 @@ class PTOAgentImageMessages:
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPPTOAgent")
 
-    @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_1"))
+    @message_handler(match=lambda msg, ctx: msg.source.startswith("Manager"))
     async def on_txt_message_1(self, message: PTOAgentMessages, ctx: MessageContext) -> None:
         # fetches available PTO for a given employee
          ## added agent ID
         print(f"{self.id.type} received message: {message.content} from : {message.source}")
     
-    @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_2"))
+    @message_handler(match=lambda msg, ctx: msg.source.startswith("Employee"))
     async def on_txt_message_2(self, message: PTOAgentMessages, ctx: MessageContext) -> None:
         # udpate PTO for a given employee if approved
          ## added agent ID
@@ -326,6 +361,7 @@ now we have a complete Agent implementation, but we need to create more such age
 - TaskAgent
 - LLMAgent
 - ManagerAgent
+- HRAgent
 - BroadcasterAgent
 
 for the sake of simplicity, for now, let's just focus on one more agent, say TaskAgent, we will deal with LLM Type agents later.
@@ -348,14 +384,14 @@ class TaskAgentImageMessages:
 from autogen_core import RoutedAgent
 class TaskAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("TaskAgent")
+        super().__init__("ERPTaskAgent")
 
-    @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_1"))
+    @message_handler(match=lambda msg, ctx: msg.source.startswith("Manager"))
     async def on_txt_message_1(self, message: TaskAgentMessages, ctx: MessageContext) -> None:
         # fetches tasks an employee
         print(f"{self.id.type} received message: {message.content} from : {message.source}")
     
-    @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_2"))
+    @message_handler(match=lambda msg, ctx: msg.source.startswith("Employee"))
     async def on_txt_message_2(self, message: TaskAgentMessages, ctx: MessageContext) -> None:
         # poeple working on one task 
         print(f"{self.id.type} received message: {message.content} from : {message.source}")

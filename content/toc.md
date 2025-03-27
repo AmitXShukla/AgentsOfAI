@@ -1,32 +1,65 @@
 # Table of Contents
----
 
-- Introduction
+- [Introduction](./intro)
 - Table of Contents
-- Important Security Notice
+- [Important Security Notice](./security)
 - Why AutoGen
-    - AutoGen vs Semantics Kernel
-- Use cases
-- More Use Cases
-- Understanding LLM
-- Tool Functions
-- More Tool Functions
-- Environment Setup
+    - [AutoGen vs Semantics Kernel](./whyautogen)
+- [Use cases](./usecases)
+- [More Use Cases](./moreusecases)
+- [Understanding LLM](./LLM)
+- [Tool Functions](./tools)
+- [More Tool Functions](./moretools)
+- [Environment Setup](./gettingstarted)
 - AI Agents
-    - Definition
-    - Actor Model
-    - Use Case
-    - Model Runtime
+    - [Definition](./agent)
+    - [Actor Model](./actor)
+    - [Use Case](./usecase)
+    - [Model Runtime](./modelruntime)
+    - [Solution Design](./solution)
 - AutoGen Core
-    - Agent
-    - Messages
-    - Runtime
-    - Agent Lifecyle
-    - Direct Messages
-    - Broadcasting
+    - [Agent](./implementation)
+    - [Messages](./messages)
+    - [Runtime](./runtime)
+    - [Agent Lifecyle](./lifecycle)
+    - [Direct Messages](./messaging)
+    - [Broadcasting](./broadcast)
 - Agent Chat
-    - why AgentChat
-    - Agent
-    - Models
-    - Messages
-    - Agent Chat Team
+    - [why AgentChat](./agentchat)
+    - [Models](./agentchatmodels)
+    - [Agent](./agentchatagent)
+    - [Messages](./agentchatmessages)
+    - [Tools](./agentchattools)
+    - [Output](./agentchatoutput)
+    - [Agent Chat Team](./agentchatteam)
+- Agent Chat Use Cases
+    - Travel Planning
+    - Company Research
+    - Literature Review
+- Multi Agent Design Patterns
+    - Sequential Flow
+    - Concurrent Agents
+    - Group Chat
+    - Handoffs
+- Pro Use Cases
+    - building an Agent like 
+        - Open AI Operator
+        - Microsoft co-assistant Dragon pilot
+        - Microsoft OmniParser
+        - Google Co-Scientist
+    - OCR Vision AI
+    - HR Time Approval Automation
+    - Expense Approval Process
+    - Supply Chain Automation
+        - Smart Supplier
+        - Smart Contract
+        - Auto Replenishment
+        - Invoice Match Process
+        - Inventory cycle count
+        - Fraud Detection
+        - Duplicate document finder
+        - Live Inventory monitoring using cameras
+    - Trading using AI Agents
+    - Finance Statements, Earning media briefing
+    - Techno-Fundamental Stock Trading
+    - Managing X Feeds

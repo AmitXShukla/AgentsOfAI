@@ -83,13 +83,13 @@ Let's attach Agents to this new runtime environment.
 from autogen_core import SingleThreadedAgentRuntime
 runtime = SingleThreadedAgentRuntime()
 ## will discuss register() in detail later
-await PTOAgent.register(runtime, "ERP_PTO_Agent", lambda: PTOAgent("T_E_PTOAgent"))
-await TaskAgent.register(runtime, "ERP_Task_Agent", lambda: TaskAgent("T_E_TaskAgent"))
+await PTOAgent.register(runtime, "AgType_ERP_PTO_Agent", lambda: PTOAgent())
+await TaskAgent.register(runtime, "AgType_ERP_Task_Agent", lambda: TaskAgent())
 ```
 
 ```{seealso} result
-    AgentType(type='ERP_PTO_Agent')
-    AgentType(type='ERP_Task_Agent')
+    AgentType(type='AgType_ERP_PTO_Agent')
+    AgentType(type='AgType_ERP_Task_Agent')
 ```
 
 ## Running the Single-Threaded Agent Runtime

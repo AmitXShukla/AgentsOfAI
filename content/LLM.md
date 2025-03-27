@@ -1,3 +1,4 @@
+(understanding_LLM)=
 # Understanding LLM
 
 I can reasonably presume that you're already familiar with LLMs, which is likely why you're here, but for the sake of thoroughness, I'll provide the response from Grok 3.0 to the question, "What is an LLM anyway?"
@@ -13,7 +14,7 @@ First, many of these organizations generously provide their open weights, allowi
 
 Let’s explore both approaches: how to tap into LLM models through an API and how to run them locally on your own system.
 
-# python environment
+# Python Environment
 
 ```python
 # Python 3.10 or later is required.
@@ -52,9 +53,9 @@ Let’s explore both approaches: how to tap into LLM models through an API and h
 !autogenstudio ui --host <host> --port 8000
 ```
 
-# running LLM locally
+# Running LLM Locally using OLLAMA
 
-## ollama, Deepseek-R1, llama3.x models
+## deepseek-R1, llama3.x models
 
 ```python
 ###################################################
@@ -82,7 +83,7 @@ Environment="OLLAMA_HOST=0.0.0.0:8000"
 !ollama serve
 ```
 
-## llama.cpp, Deepseek-R1, llama3.x models
+## llama.cpp, deepseek-R1, llama3.x models
 ```python
 ######################################################
 # install llama.cpp to run deepseek-r1 | llama models
@@ -111,13 +112,13 @@ Environment="OLLAMA_HOST=0.0.0.0:8000"
 !./main -m ./deepseek-r1.ggml.bin -p "Explain quantum mechanics." -t 8 -n 128 --temp 0.8
 ```
 
-# running LLM through API
+# Running LLM through API
 
 We'll discuss few different approaches.
 - **Approach 1** - Setup Anthropic LLMs
 - **Approach 2** - Setup Open AI LLMs
 - **Approach 3** - Setup Google Gemini AI
-- **Approach 4** - Setup Groq API
+- **Approach 4** - Setup GROQ API
 - **Approach 5** - Setup xAI Grok 3.0 API
 
 The selection of a Large Language Model (LLM) is influenced by factors such as your specific business needs, financial constraints, and personal tastes.
@@ -125,7 +126,7 @@ The selection of a Large Language Model (LLM) is influenced by factors such as y
 In this section, I'll present few distinct methods for establishing connections with various LLM service providers.
 Additionally, I recommend utilizing this occasion as an avenue to evaluate Large Language Models against the backdrop of your unique inputs and industry-specific needs.
 
-## Approach 1 : Setup Anthropic LLMs
+## approach 1 : Setup Anthropic LLMs
 Let's first set up our Python working environment. While we can also use Node.js, please note that for the current version, we will be using Python for development. 
 
 Please signup using these links and get your own API Keys.
@@ -219,7 +220,7 @@ message = client.messages.create(
 print(message.content)
 ```
 
-## Approach 2 : Setup Open AI LLMs
+## approach 2 : Setup Open AI LLMs
 
 Let's first set up our Python working environment. While we can also use Node.js, please note that for the current version, we will be using Python for development.
 
@@ -265,7 +266,7 @@ response = client.chat.completions.create(
 )
 ```
 
-## Approach 3 : Setup Google Gemini LLMs
+## approach 3 : Setup Google Gemini LLMs
 
 Let's first set up our Python working environment. While we can also use Node.js, please note that for the current version, we will be using Python for development.
 
@@ -291,13 +292,13 @@ response = model.generate_content("Write a story about an AI and magic")
 print(response.text)
 ```
 
-## Approach 4 - Running Groq Llama 3.3 API
+## approach 4 - Running GROQ Llama 3.3 API
 
 Let's first set up our Python working environment. While we can also use Node.js, please note that for the current version, we will be using Python for development.
 
 Please signup and get your own API Keys.
 
-[Groq API Key](https://console.groq.com/keys)
+[GROQ API Key](https://console.groq.com/keys)
 
 ```python
 # !pip install groq
@@ -326,7 +327,7 @@ for chunk in completion:
     print(chunk.choices[0].delta.content or "", end="")
 ```
 
-## Approach 5 - Running xAI Grok 3.0
+## approach 5 - Running xAI Grok 3.0
 
 Let's first set up our Python working environment. While we can also use Node.js, please note that for the current version, we will be using Python for development.
 

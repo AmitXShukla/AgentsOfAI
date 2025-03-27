@@ -1,6 +1,6 @@
 # Why AutoGen
 
-why not CrewAI, Langchain, llamaindex or Swarms or any other AI Agents framework, which one you should start with?
+why not CrewAI, LangChain, llamaIndex or Swarms or any other AI Agents framework, which one you should start with?
 
 When I need to choose between different programming languages, frameworks, or tools, I follow a simple rule: I spend no more than 5 minutes reading the quick start guide.
 and then I pick the one that triggers me to open a code editor and start coding right away.
@@ -22,17 +22,17 @@ So, I'll use AutoGen 0.4. If it doesn't work out, I'll change my code anyway - t
 
 # AutoGen vs Semantics Kernel
 
-First of the all, AutoGen and Semanrics Kernels aren't competing framework and instead are complimentry.
+First of the all, AutoGen and Semantics Kernels aren't competing framework and instead are complimentary.
 
-## Are They Duplicates?
+## are they duplicates?
 While there might be some overlap in their capabilities (both deal with AI agents), their target audiences and goals differ:
-Autogen is for researchers and innovators prototyping cutting-edge systems.
+AutoGen is for researchers and innovators prototyping cutting-edge systems.
 
 Semantic Kernel is for developers deploying stable, scalable AI solutions in production.
 
-> Both AutoGen and Semantics Kernal are Microsoft sponsored.
+> Both AutoGen and Semantics Kernel are Microsoft sponsored.
 
-`Think of Autogen as a lab for experimentation and Semantic Kernel as the factory for implementation.`
+`Think of AutoGen as a lab for experimentation and Semantic Kernel as the factory for implementation.`
 
 Microsoft AutoGen 0.4 is a top choice for complex use cases involving multi-agent collaboration, asynchronous workflows, and scalability, thanks to its redesigned architecture and enterprise-friendly features. However, the best framework depends on your needs:
 

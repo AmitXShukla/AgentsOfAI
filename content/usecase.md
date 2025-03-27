@@ -31,7 +31,7 @@ flowchart TD
     style I fill:#e0f7fa,stroke:#000
 ```
 
-This use case skips many details and complexities for simplicity’s sake.
+*This use case skips many details and complexities for simplicity’s sake.*
 
 ## PTO Business Process
 

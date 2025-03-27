@@ -1,0 +1,33 @@
+# Cookbook
+
+- AgentChat Use Cases
+    - Travel Planning
+    - Company Research
+    - Literature Review
+- Multi Agent Design Patterns
+    - Sequential Flow
+    - Concurrent Agents
+    - Group Chat
+    - Handoffs
+- Pro Use Cases
+    - building an Agent like 
+        - Open AI Operator
+        - Microsoft co-assistant Dragon pilot
+        - Microsoft OmniParser
+        - Google Co-Scientist
+    - OCR Vision AI
+    - HR Time Approval Automation
+    - Expense Approval Process
+    - Supply Chain Automation
+        - Smart Supplier
+        - Smart Contract
+        - Auto Replenishment
+        - Invoice Match Process
+        - Inventory cycle count
+        - Fraud Detection
+        - Duplicate document finder
+        - Live Inventory monitoring using cameras
+    - Trading using AI Agents
+    - Finance Statements, Earning media briefing
+    - Techno-Fundamental Stock Trading
+    - Managing X Feeds

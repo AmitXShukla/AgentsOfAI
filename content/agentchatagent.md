@@ -1,87 +1,226 @@
 # Agent
 
-In previous chapters, we learns the based of AutoGen Core.
-If you go through AutoGen official documentation, almost every one recommended to start with AutoGen Agent Chat
+```{mermaid}
+sequenceDiagram
+    %% Adding a background box with light color
+    rect rgba(200, 212, 223, 0.8)
+        participant LLMAgent
+        participant ManagerAgent
+        participant AnotherAgent
+        participant PTOAgent
+        participant TaskAgent
+        LLMAgent->>PTOAgent: request "Available PTO" for Employee 123
+        PTOAgent-->>LLMAgent: respond with 16
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 123
+        PTOAgent-->>ManagerAgent: respond with 16
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 124
+        PTOAgent-->>ManagerAgent: respond with 8
+        ManagerAgent->>PTOAgent: request "Available PTO" for Employee 125
+        PTOAgent-->>ManagerAgent: respond with 8
+        AnotherAgent->>PTOAgent: request "Available PTO" for Employee 512
+        PTOAgent-->>AnotherAgent: respond with 24
+        ManagerAgent->>TaskAgent: request "Assigned Tasks" for Employee 512
+        TaskAgent-->>ManagerAgent: respond with TaskList
+    end
+```
+
+In our use case, we have implemented `PTOAgent`, `TaskAgent` using `AutoGen Core`. These two agents has some kind of behavior which resembles more of a function call. that is, given an employee ID, `PTOAgent` and `TaskAgent` queries into database and fetches the available PTO and assigned tasks to this given employee.
+When need any such behavior from an Agent, which mostly appears to be passing some values and doing a defined act, writing Python like API or query based function with in Agent definition is acceptable.
+
+However, now, we are building other parts of this use case, its realized that, We need a more intuitive chat bot like user interact which lets employees and manager interact with a system.
+We need an Agent like `LLMAgent` which can provide a starting point to a GUI interface, which greets the user and when a user pass values such as employee ID or employee name and queries about available PTO, this `LLMAgent` is smart to break user prompt into appropriate query, fetch parameters and call tool functions or other Agents such as `PTOAgent` and `TaskAgent` to fetch this information.
+
+We can always create one "all in one - know all" kind of Agent, but it may be very complex and may not be a useful solution in long term as complexity grows in our app. Instead breaking tasks, roles into appropriate Agents and managing tasks through Agents seems more logical approach.
+
+So let's implement a `LLMAgent`, which simply greets the user (employee in this use case), ask for an employee ID and pass it on to other agents such `PTOAgent` and `TaskAgent`, get those information from those Agents and pass it back to user.
+
+We could have build this using `AutoGen Core`. but that's the whole point of learning AutoGen `AgentChat`. `AgentChat` provides "preset Agents" which are configured in such a way that you can import not only those Agents, but other preset behavior which you don't want to build from scratch.
+
+AutoGen `AgentChat` provide these preset configuration.
+
+## Accessing LLM Models
+
+Before we start building an AI Agent with AutoGen `AgentChat`, ensure you have access to an LLM model service or a locally hosted model. If needed, refer to the previous chapter {ref}`understanding_LLM` for guidance.
+
+### OpenAI ChatGPT model
+Here’s a script to quickly test the Open AI ChatGPT Model LLM model API Service.
+
+```python
+! pip install "autogen-ext[openai]"
+```
+
+```python
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+
+openai_model_client = OpenAIChatCompletionClient(
+    model="gpt-4o-2024-08-06",
+    # api_key="sk-...", # Optional if you have an OPENAI_API_KEY environment variable set.
+)
+
+## test OPEN AI model
+from autogen_core.models import UserMessage
+
+result = await openai_model_client.create([
+            UserMessage(content="What is the capital of France?",
+            source="user")])
+print(result)
+```
+
+```{seealso} result
+    CreateResult(finish_reason='stop', 
+    content='The capital of France is Paris.', 
+    usage=RequestUsage(prompt_tokens=15, completion_tokens=7), 
+    cached=False, logprobs=None)
+```
+### Locally hosted `Ollama` model
+Here’s a script to quickly test the locally hosted `Ollama` LLM model API Service.
+
+```{warning}
+    AutoGen works with Ollama-hosted models now,
+    but tool support isn’t fully ready yet.
+    
+    We need a temporary fix to use the Tools function with these models.
+```
+
+```python
+# LiteLLM is an open-source locally run proxy server
+# that provides an OpenAI-compatible API.
+# liteLLM will us connect ollama to OpenAI-compatible API
+# make sure you already ollama installed and running
+
+! pip install 'litellm[proxy]'
+
+# run litellm
+# !litellm --model ollama/deepseek-r1 
+# doesn't have tools support yet
+!litellm --model ollama/llama3.2
+# !ollama pull llama3.2
+# !ollama list
+```
+
+```python
+# this is how you call Ollama models in AutoGen Agent
+custom_model_client = OpenAIChatCompletionClient(
+    model="deepseek-r1",
+# most of other params are unnecessary if litellm is accessed
+    base_url="http://0.0.0.0:4000",
+    api_key="placeholder",
+    model_info={
+        "vision": False,
+        "function_calling": True,
+        "json_output": False,
+        # "family": ModelFamily.R1,
+    },
+)
+```
+
+## Assistant Agent
+
+AssistantAgent is a built-in agent that uses a language model and has the ability to use tools.
+
+```python
+# import autogen
+from autogen_agentchat.agents import AssistantAgent
+from autogen_agentchat.ui import Console
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+import asyncio
+from autogen_core.models import ModelFamily
 
 
-In this book, you might be wondering why I went through the hassle of learning AutoGen Core concept then now, we were almost there and ready to work on our HR TimeSheet business process automation use case and now I just switched gear and want to learn about Agent Chat before finishing the use case using AutoGen Core.
+# update main function to 
+# use locally hosted ollama models
+##### WARNING ############################
+# This is an area of active development 
+# and a native Ollama client for AutoGen
+# is planned for a future release.
+# workaround is to use litellm
+##########################################
 
-well.. that's the point, AutoGen Core fundamentals are a must know if you want to work on a professional AI Agent application. that knowledge is necessary to make you a Pro AI agent Engineer.
+custom_model_client = OpenAIChatCompletionClient(
+    model="deepseek-r1",
+# most of other params are unnecessary if litellm is accessed
+    base_url="http://0.0.0.0:4000",
+    api_key="placeholder",
+    model_info={
+        "vision": False,
+        "function_calling": True,
+        "json_output": False,
+        # "family": ModelFamily.R1,
+    },
+)
 
-Now let;s talk about Agent Chat.
+async def main() -> None:
+    # Define an agent
+    agent = AssistantAgent(
+                    name="LLMAgent",
+                    model_client=custom_model_client,
+                    # tools=[tools],
+    )
 
-AgentChat is a high-level API for building multi-agent applications. It is built on top of the AutoGen-core package. For beginner users, AgentChat is the recommended starting point. For advanced users, AutoGen-core’s event-driven programming model provides more flexibility and control over the underlying components.
+# NOTE: if running this inside a Python script
+# you'll need to use asyncio.run(main()).
+# await main()
+asyncio.run(main())
 
-However, I have news for you, Agent Chat is mostly community driven and using Agent Chat comes with the advantage that it offers so many preset Agent and team configuration that makes it so easy to start with.
+# copy this entire code into a python file
+# main.py and run following from a terminal
+# python main.py
+# this code will work fine and will accept and answer prompts
+# however, you will notice that I have commented ~tools
+```
 
-One of the most popular multi design pattern `Magentic-One` which we will learn in advance topics, was first built in AutoGen Core,
-is a design pattern, which allows users to quickly build and spin a pro use case implementation is now totally re0built using Agent Chat.
+## Agent Responses
+We can use the on_messages() method to get the agent response to a given message.
 
-So the point is,
-
-Agent Chat because of it's community support has grown into a concept more powerful than "just a high level API".
-It's so good that often, when you working with AutoGen Core, instead of hassle of going through and a building a complex Agent design pattern, you would rather pull a preset agent and team configuration with in your AutoGen Core workflow and it will work just fine.
-
-
-
-## AutoGen Agent Chat Concepts
-
-We have recently learned the basics of what an AI Agent is and how Multi-agent systems consist of a group of individual AI Agents working together within a single environment or across distributed environments. The primary purpose of implementing a Single Agent or a Multi-Agent system is to solve a business use case by accomplishing a specific set of tasks, thereby automating the business process.
-
-However, our exploration is not complete; there is still much more to learn about AI Agents. Before we proceed to study Agent behavior in detail, let's first delve deeper into the underlying mechanisms of an AI Agent.
-
-now, we got our hands on using AutoGen Core, why to even bother learning about AGent Chat,
-Agent Chat provide us many many present Agent Configuration which are ready to use,
-for example, a PDF reader, web crawler, data (get this from `Magentic-One` and Agent Chat config)
-
-now since we understand the basic so AI Agents, Messages, topics, subscription, their run time and lifecycle.
-But in fact, this is lot to learn, what if there is some kind of high level abstract of this whole mechanism which can help us get started.
-
-Here comes AI Agent Chat, AI Agent Chat is nothing but high level abstract design pattern built on top of AI AGent Core.
-
-In the beginning I said, that it's easy to get started with AI Agent Chat, but if you want to build a complex production level AI Agent Code or large and extremely complex process and knowing Ai Agent Core is must have and using high level pattern like AI Agent Chat might not be enough.
-
-I want to take back my words, only half of that statement is true,
-It;s great and must know about Agent Core, what Agent Core components are, understanding foundation is always critical and non-negotiable.
-
-However saying AI Agent Chat is not good enough to build a production level complex Agent framework is not enough, this is not right statement.
-
-AI Agent Chat has evolved so much that it is capable of fully supporting to create an extremely complex business problem or automation.
-Look at the paper `Magentic-One`, this design pattern initially was developed in AI Agent Core, but now is fully ported to AI Agent Chat and it does an amazing job.
-
-but knowledge gained in AI Agent Core is not lost and will always be useful.
-
-Let;s dig into basics of AI Agent Chat.
-
-
-TODO: Show Agent Chat framework image or mermaid graph
-
-![AgentChat](https://github.com/microsoft/autogen/raw/main/autogen-landing.jpg)
-
-## AutoGen AgentChat
-
-First of all, AutoGen is an opinionated high level API built on top of AutoGen Core.
-Often time, when you want to test out a functionality with out writing too much code and very quickly, you can use either use Agent Studio. Which provides a great visual interface to test out AI Agents quickly.
-
-and when you need a finer control over your proof of concept, AGent Chat exactly provides that, it's not as user friendly as Agent Studio, which is completely visual drag and drop, no code environment,
-
-Agent Chat provides you some control over your Agents.
-
-However, don't underestimate and think Agent Chat is only capable of a higher level quick POC,
-recently Agent Chat has become so popular and powerful that it is no less than AutoGen Core itself, and just to mention, it's AutoGen most populate design pattern called `Magentic-One` which was also referred a flagship AutoGen0.2 is now completely written using Agent Chat.
-
-point is, Agent Chat although being a higher level API on AutoGen Core is fully capable of delivering a great complex use case implementation.
+```python
+async def assistant_run() -> None:
+    response = await agent.on_messages(
+        [TextMessage(content="Find information on AutoGen",
+            source="user")],
+            cancellation_token=CancellationToken(),
+    )
+    print(response.inner_messages)
+    print(response.chat_message)
 
 
-## Define AI Agent Chat Assistant Agent
+# Use asyncio.run(assistant_run()) when running in a script.
+await assistant_run()
+```
 
-who, how this is not very much different than Agent Core at all,
-as I mentioned above Agent Chat provides preset Agent configuration which you can use.
+```{seealso} result
+    [ToolCallRequestEvent(source='assistant', 
+    models_usage=RequestUsage(prompt_tokens=598, completion_tokens=16), 
+    content=[FunctionCall(id='call_9UWYM1CgE3ZbnJcSJavNDB79',
+    arguments='{"query":"AutoGen"}', name='web_search')],
+    type='ToolCallRequestEvent'), 
+    ToolCallExecutionEvent(source='assistant', models_usage=None, 
+    content=[FunctionExecutionResult(content=
+        'AutoGen is a programming framework for building multi-agent applications.',
+        call_id='call_9UWYM1CgE3ZbnJcSJavNDB79', is_error=False)],
+        type='ToolCallExecutionEvent')]
+    source='assistant' models_usage=None 
+    content='AutoGen is a programming framework 
+    for building multi-agent applications.' type='ToolCallSummaryMessage'
+```
 
-if you recall, in previous chapter, this was our Agent design pattern for the managing timesheets use case.
+## Other Preset Agents
 
-TODO: mermaid agents for timesheet
+Other Preset Agents
 
-and we did implement PTO Agent and Task Agent, however, we didn't get a chance to complete other agents such LLMAgent.
+The following preset agents are available:
 
-Now let;s implement this agent
+    UserProxyAgent: An agent that takes user input returns it as responses.
+
+    CodeExecutorAgent: An agent that can execute code.
+
+    OpenAIAssistantAgent: An agent that is backed by an OpenAI Assistant, with ability to use custom tools.
+
+    MultimodalWebSurfer: A multi-modal agent that can search the web and visit web pages for information.
+
+    FileSurfer: An agent that can search and browse local files for information.
+
+    VideoSurfer: An agent that can watch videos for information.
+
+```{note}
+We will discuss additional Preset Agents in subsequent chapters as we explore advanced use cases.
+```

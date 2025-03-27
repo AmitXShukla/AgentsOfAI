@@ -85,7 +85,7 @@ FirstAgent.do_something("Hello World!")
 
 ```python
 # standalone implementation of an AI Agent
-# add Agent identifier
+# add Agent identifier, properties, methods
 
 class MyFirstAgent:
     def __init__(self, name: str, agent_id: str, property: str) -> None:
@@ -129,8 +129,6 @@ let's create another sample agent.
 
 ```python
 # standalone implementation of an AI Agent
-# add Agent identifier
-# add Agent behavior
 
 class MySecondAgent:
     def __init__(self, name: str, agent_id: str, 

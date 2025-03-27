@@ -27,6 +27,7 @@ project:
         - file: content/actor.md
         - file: content/usecase.md
         - file: content/modelruntime.md
+        - file: content/solution.md
     - title: AutoGen Core
       children:
         - file: content/implementation.md
@@ -38,10 +39,13 @@ project:
     - title: Agent Chat
       children:
         - file: content/agentchat.md
-        - file: content/agentchatagent.md
         - file: content/agentchatmodels.md
+        - file: content/agentchatagent.md
         - file: content/agentchatmessages.md
+        - file: content/agentchattools.md
+        - file: content/agentchatoutput.md
         - file: content/agentchatteam.md
+    - file: content/cookbook.md
 site:
   title: Agents of AI ~ Hack the Core
   favicon: "content/images/logo.png"

@@ -58,7 +58,7 @@ gantt
     5 hours :2023-04-03, 1d
 ```
 
-### Business Process
+### business process
 
 ```{mermaid}
 graph TD
@@ -201,7 +201,7 @@ graph TD
 
 ### AI Agents Operation Tasks
 
-#### Manage Time Operations
+#### manage time operations
 1. auto timesheets
     - timesheets reminder
     - auto fill
@@ -244,7 +244,7 @@ gantt
     Exceptions    :2025
 ```
 
-#### Manage Expense Operations
+#### manage expense operations
 1. auto expense fill
 2. upload receipts | fill lines
 2. ask questions 

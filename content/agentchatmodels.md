@@ -1,87 +1,149 @@
 # Models
 
-In previous chapters, we learns the based of AutoGen Core.
-If you go through AutoGen official documentation, almost every one recommended to start with AutoGen Agent Chat
+## using OpenAI LLM models
 
+In today’s fast-moving world, new and improved AI models are released often, making it tough to keep your applications up-to-date and using the best technology. In our AI Agent-based solution, we aim to design a framework that isn’t tied to just one language model (LLM). Instead, it’s built to work with multiple LLMs from different providers or even local models—depending on needs like privacy or custom tuning with an organization’s data.
 
-In this book, you might be wondering why I went through the hassle of learning AutoGen Core concept then now, we were almost there and ready to work on our HR TimeSheet business process automation use case and now I just switched gear and want to learn about Agent Chat before finishing the use case using AutoGen Core.
+`AutoGen Core` offers tools to create your own libraries to access LLM model, while `AutoGen-Ext` lets you use pre-made model client libraries. If you want a specific LLM, `AutoGen-Ext` likely has a model client for it. If not, you can build your own with `AutoGen Core`. In short, `AutoGen-Ext` provides model clients to connect with popular LLMs easily.
 
-well.. that's the point, AutoGen Core fundamentals are a must know if you want to work on a professional AI Agent application. that knowledge is necessary to make you a Pro AI agent Engineer.
+In this chapter, we’ll explore how to use some of these models, including OpenAI, Gemini, Anthropic Claude, and locally hosted `Ollama` models. Let’s dive in.
 
-Now let;s talk about Agent Chat.
+Agents often need to connect to LLM services like **Open AI**, **Gemini**, **Anthropic Claude**, and local **`Ollama`**-based models. Since each provider has its own API, `AutoGen Core` sets a standard for model clients, and `AutoGen-Ext` offers ready-made clients for popular services.
 
-AgentChat is a high-level API for building multi-agent applications. It is built on top of the AutoGen-core package. For beginner users, AgentChat is the recommended starting point. For advanced users, AutoGen-core’s event-driven programming model provides more flexibility and control over the underlying components.
+AgentChat uses these clients to work with different models.
 
-However, I have news for you, Agent Chat is mostly community driven and using Agent Chat comes with the advantage that it offers so many preset Agent and team configuration that makes it so easy to start with.
+This section gives a quick look at available model clients. For more on using them, check the Core API documentation on Model Clients.
 
-One of the most popular multi design pattern `magentic-core` which we will learn in advance topics, was first built in AutoGen Core,
-is a design pattern, which allows users to quickly build and spin a pro use case implementation is now totally re0built using Agent Chat.
+## OpenAI
+To access OpenAI models, install the Open AI extension, which allows you to use the OpenAIChatCompletionClient.
 
-So the point is,
+```python
+pip install "autogen-ext[openai]"
+```
 
-Agent Chat because of it's community support has grown into a concept more powerful than "just a high level API".
-It's so good that often, when you working with AutoGen Core, instead of hassle of going through and a building a complex Agent design pattern, you would rather pull a preset agent and team configuration with in your AutoGen Core workflow and it will work just fine.
+```{warning}
+Please signup and get your own API Keys.
+[Open AI API Key](https://platform.openai.com/docs/api-reference/introduction)
+```
 
+```python
+from autogen_ext.models.openai import OpenAIChatCompletionClient
 
+openai_model_client = OpenAIChatCompletionClient(
+    model="gpt-4o", # change this latest available model
+    ## Optional if you have an OPENAI_API_KEY environment variable set.
+    # api_key="sk-...",
+)
+```
+>   test the model client.
 
-## AutoGen Agent Chat Concepts
+```python
+from autogen_core.models import UserMessage
 
-We have recently learned the basics of what an AI Agent is and how Multi-agent systems consist of a group of individual AI Agents working together within a single environment or across distributed environments. The primary purpose of implementing a Single Agent or a Multi-Agent system is to solve a business use case by accomplishing a specific set of tasks, thereby automating the business process.
+result = await openai_model_client.create([
+                    UserMessage(
+                        content="What is the capital of France?",
+                        source="user")])
+print(result)
+```
 
-However, our exploration is not complete; there is still much more to learn about AI Agents. Before we proceed to study Agent behavior in detail, let's first delve deeper into the underlying mechanisms of an AI Agent.
+```{seealso} result
+    CreateResult(finish_reason='stop', 
+    content='The capital of France is Paris.', 
+    usage=RequestUsage(prompt_tokens=15, 
+    completion_tokens=7), cached=False, logprobs=None)
+```
 
-now, we got our hands on using AutoGen Core, why to even bother learning about AGent Chat,
-Agent Chat provide us many many present Agent Configuration which are ready to use,
-for example, a PDF reader, web crawler, data (get this from `magentic-core` and Agent Chat config)
+## using Anthropic LLM models
+To use the AnthropicChatCompletionClient, you need to install the anthropic extension model client.
 
-now since we understand the basic so AI Agents, Messages, topics, subscription, their run time and lifecycle.
-But in fact, this is lot to learn, what if there is some kind of high level abstract of this whole mechanism which can help us get started.
+Please signup using these links and get your own API Keys. [ANTHROPIC_API_KEY](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
 
-Here comes AI Agent Chat, AI Agent Chat is nothing but high level abstract design pattern built on top of AI AGent Core.
+```python
+# !pip install -U "autogen-ext[anthropic]"
+```
 
-In the beginning I said, that it's easy to get started with AI Agent Chat, but if you want to build a complex production level AI Agent Code or large and extremely complex process and knowing Ai Agent Core is must have and using high level pattern like AI Agent Chat might not be enough.
+```python
+from autogen_core.models import UserMessage
+from autogen_ext.models.anthropic import AnthropicChatCompletionClient
 
-I want to take back my words, only half of that statement is true,
-It;s great and must know about Agent Core, what Agent Core components are, understanding foundation is always critical and non-negotiable.
+anthropic_client = AnthropicChatCompletionClient(
+                        model="claude-3-7-sonnet-20250219")
+result = await anthropic_client.create(
+                        [UserMessage(
+                            content="What is the capital of France?",
+                            source="user")])
+print(result)
+```
 
-However saying AI Agent Chat is not good enough to build a production level complex Agent framework is not enough, this is not right statement.
+```{seealso} result
+    finish_reason='stop' content="The capital of France is Paris. 
+    It's not only the political and administrative capital 
+    but also a major global center for art, fashion, gastronomy, 
+    and culture. Paris is known for landmarks such as the Eiffel Tower, 
+    the Louvre Museum, Notre-Dame Cathedral, and the Champs-Élysées."
+    usage=RequestUsage(prompt_tokens=14, completion_tokens=73) 
+    cached=False logprobs=None thought=None
+```
 
-AI Agent Chat has evolved so much that it is capable of fully supporting to create an extremely complex business problem or automation.
-Look at the paper `magentic-core`, this design pattern initially was developed in AI Agent Core, but now is fully ported to AI Agent Chat and it does an amazing job.
+## using Gemini LLM models
 
-but knowledge gained in AI Agent Core is not lost and will always be useful.
+You can use the OpenAIChatCompletionClient with the Gemini API.
 
-Let;s dig into basics of AI Agent Chat.
+Please signup and get your own API Keys.
+[Gemini API Key](https://ai.google.dev/gemini-api)
 
+```python
+from autogen_core.models import UserMessage
+from autogen_ext.models.openai import OpenAIChatCompletionClient
 
-TODO: Show Agent Chat framework image or mermaid graph
+model_client = OpenAIChatCompletionClient(
+    model="gemini-1.5-flash-8b",
+    # api_key="GEMINI_API_KEY",
+)
 
-![AgentChat](https://github.com/microsoft/autogen/raw/main/autogen-landing.jpg)
+response = await model_client.create([
+                UserMessage(content=
+                        "What is the capital of France?",
+                        source="user")])
+print(response)
+```
 
-## AutoGen AgentChat
+```{seealso} result
+    finish_reason='stop' content='Paris\n'
+    usage=RequestUsage(prompt_tokens=7, completion_tokens=2)
+    cached=False logprobs=None thought=None
+```
 
-First of all, AutoGen is an opinionated high level API built on top of AutoGen Core.
-Often time, when you want to test out a functionality with out writing too much code and very quickly, you can use either use Agent Studio. Which provides a great visual interface to test out AI Agents quickly.
+<!-- ## using xAI Grok LLM models -->
 
-and when you need a finer control over your proof of concept, AGent Chat exactly provides that, it's not as user friendly as Agent Studio, which is completely visual drag and drop, no code environment,
+## using `Ollama` LLM models
 
-Agent Chat provides you some control over your Agents.
+`Ollama` is a local model server that can run models locally on your machine.
+To use `Ollama`, install the `Ollama` extension and use the `OllamaChatCompletionClient`.
 
-However, don't underestimate and think Agent Chat is only capable of a higher level quick POC,
-recently Agent Chat has become so popular and powerful that it is no less than AutoGen Core itself, and just to mention, it's AutoGen most populate design pattern called `megentic-Core` which was also referred a flagship AutoGen0.2 is now completely written using Agent Chat.
+```python
+pip install -U "autogen-ext[ollama]"
+```
 
-point is, Agent Chat although being a higher level API on AutoGen Core is fully capable of delivering a great complex use case implementation.
+```python
+from autogen_core.models import UserMessage
+from autogen_ext.models.ollama import OllamaChatCompletionClient
 
+# Assuming your Ollama server is running locally on port 11434.
+ollama_model_client = OllamaChatCompletionClient(model="llama3.2")
 
-## Define AI Agent Chat Assistant Agent
+response = await ollama_model_client.create([
+                    UserMessage(content=
+                        "What is the capital of France?", 
+                        source="user")])
+print(response)
+```
 
-who, how this is not very much different than Agent Core at all,
-as I mentioned above Agent Chat provides preset Agent configuration which you can use.
+```{seealso} result
+    finish_reason='unknown' content='The capital of France is Paris.'
+    usage=RequestUsage(prompt_tokens=32, completion_tokens=8)
+    cached=False logprobs=None thought=None
+```
 
-if you recall, in previous chapter, this was our Agent design pattern for the managing timesheets use case.
-
-TODO: mermaid agents for timesheet
-
-and we did implement PTO Agent and Task Agent, however, we didn't get a chance to complete other agents such LLMAgent.
-
-Now let;s implement this agent
+<!-- ## Semantic Kernels -->

@@ -1,87 +1,78 @@
 # Agent Chat Team
 
-In previous chapters, we learns the based of AutoGen Core.
-If you go through AutoGen official documentation, almost every one recommended to start with AutoGen Agent Chat
+Teams
 
+In this section you’ll learn how to create a multi-agent team (or simply team) using AutoGen. A team is a group of agents that work together to achieve a common goal.
 
-In this book, you might be wondering why I went through the hassle of learning AutoGen Core concept then now, we were almost there and ready to work on our HR TimeSheet business process automation use case and now I just switched gear and want to learn about Agent Chat before finishing the use case using AutoGen Core.
+We’ll first show you how to create and run a team. We’ll then explain how to observe the team’s behavior, which is crucial for debugging and understanding the team’s performance, and common operations to control the team’s behavior.
 
-well.. that's the point, AutoGen Core fundamentals are a must know if you want to work on a professional AI Agent application. that knowledge is necessary to make you a Pro AI agent Engineer.
+Note
 
-Now let;s talk about Agent Chat.
+When should you use a team? Teams are for complex tasks that require collaboration and diverse expertise. However, they also demand more scaffolding to steer compared to single agents. While AutoGen simplifies the process of working with teams, start with a single agent for simpler tasks, and transition to a multi-agent team when a single agent proves inadequate. Ensure that you have optimized your single agent with the appropriate tools and instructions before moving to a team-based approach.
+Creating a Team
 
-AgentChat is a high-level API for building multi-agent applications. It is built on top of the AutoGen-core package. For beginner users, AgentChat is the recommended starting point. For advanced users, AutoGen-core’s event-driven programming model provides more flexibility and control over the underlying components.
+RoundRobinGroupChat is a simple yet effective team configuration where all agents share the same context and take turns responding in a round-robin fashion. Each agent, during its turn, broadcasts its response to all other agents, ensuring that the entire team maintains a consistent context.
 
-However, I have news for you, Agent Chat is mostly community driven and using Agent Chat comes with the advantage that it offers so many preset Agent and team configuration that makes it so easy to start with.
+We will begin by creating a team with two AssistantAgent and a TextMentionTermination condition that stops the team when a specific word is detected in the agent’s response.
 
-One of the most popular multi design pattern `magentic-core` which we will learn in advance topics, was first built in AutoGen Core,
-is a design pattern, which allows users to quickly build and spin a pro use case implementation is now totally re0built using Agent Chat.
+The two-agent team implements the reflection pattern, a multi-agent design pattern where a critic agent evaluates the responses of a primary agent. Learn more about the reflection pattern using the Core API.
 
-So the point is,
+## creating a team
 
-Agent Chat because of it's community support has grown into a concept more powerful than "just a high level API".
-It's so good that often, when you working with AutoGen Core, instead of hassle of going through and a building a complex Agent design pattern, you would rather pull a preset agent and team configuration with in your AutoGen Core workflow and it will work just fine.
+```python
+import asyncio
 
+from autogen_agentchat.agents import AssistantAgent
+from autogen_agentchat.base import TaskResult
+from autogen_agentchat.conditions import ExternalTermination, TextMentionTermination
+from autogen_agentchat.teams import RoundRobinGroupChat
+from autogen_agentchat.ui import Console
+from autogen_core import CancellationToken
+from autogen_ext.models.openai import OpenAIChatCompletionClient
 
+# Create an OpenAI model client.
+model_client = OpenAIChatCompletionClient(
+    model="gpt-4o-2024-08-06",
+    # api_key="sk-...", # Optional if you have an OPENAI_API_KEY env variable set.
+)
 
-## AutoGen Agent Chat Concepts
+# Create the primary agent.
+primary_agent = AssistantAgent(
+    "primary",
+    model_client=model_client,
+    system_message="You are a helpful AI assistant.",
+)
 
-We have recently learned the basics of what an AI Agent is and how Multi-agent systems consist of a group of individual AI Agents working together within a single environment or across distributed environments. The primary purpose of implementing a Single Agent or a Multi-Agent system is to solve a business use case by accomplishing a specific set of tasks, thereby automating the business process.
+# Create the critic agent.
+critic_agent = AssistantAgent(
+    "critic",
+    model_client=model_client,
+    system_message="Provide constructive feedback. Respond with 'APPROVE' to when your feedbacks are addressed.",
+)
 
-However, our exploration is not complete; there is still much more to learn about AI Agents. Before we proceed to study Agent behavior in detail, let's first delve deeper into the underlying mechanisms of an AI Agent.
+# Define a termination condition that stops the task if the critic approves.
+text_termination = TextMentionTermination("APPROVE")
 
-now, we got our hands on using AutoGen Core, why to even bother learning about AGent Chat,
-Agent Chat provide us many many present Agent Configuration which are ready to use,
-for example, a PDF reader, web crawler, data (get this from `magentic-core` and Agent Chat config)
+# Create a team with the primary and critic agents.
+team = RoundRobinGroupChat([primary_agent, critic_agent], termination_condition=text_termination)
+```
 
-now since we understand the basic so AI Agents, Messages, topics, subscription, their run time and lifecycle.
-But in fact, this is lot to learn, what if there is some kind of high level abstract of this whole mechanism which can help us get started.
+## running a team
 
-Here comes AI Agent Chat, AI Agent Chat is nothing but high level abstract design pattern built on top of AI AGent Core.
+## observing a team
 
-In the beginning I said, that it's easy to get started with AI Agent Chat, but if you want to build a complex production level AI Agent Code or large and extremely complex process and knowing Ai Agent Core is must have and using high level pattern like AI Agent Chat might not be enough.
+## resetting a team
 
-I want to take back my words, only half of that statement is true,
-It;s great and must know about Agent Core, what Agent Core components are, understanding foundation is always critical and non-negotiable.
+## stopping a team
 
-However saying AI Agent Chat is not good enough to build a production level complex Agent framework is not enough, this is not right statement.
+## resuming a team
 
-AI Agent Chat has evolved so much that it is capable of fully supporting to create an extremely complex business problem or automation.
-Look at the paper `magentic-core`, this design pattern initially was developed in AI Agent Core, but now is fully ported to AI Agent Chat and it does an amazing job.
+## aborting a team
 
-but knowledge gained in AI Agent Core is not lost and will always be useful.
+## Single Agent team
 
-Let;s dig into basics of AI Agent Chat.
+## Human-in-the-loop
 
+## Termination
 
-TODO: Show Agent Chat framework image or mermaid graph
-
-![AgentChat](https://github.com/microsoft/autogen/raw/main/autogen-landing.jpg)
-
-## AutoGen AgentChat
-
-First of all, AutoGen is an opinionated high level API built on top of AutoGen Core.
-Often time, when you want to test out a functionality with out writing too much code and very quickly, you can use either use Agent Studio. Which provides a great visual interface to test out AI Agents quickly.
-
-and when you need a finer control over your proof of concept, AGent Chat exactly provides that, it's not as user friendly as Agent Studio, which is completely visual drag and drop, no code environment,
-
-Agent Chat provides you some control over your Agents.
-
-However, don't underestimate and think Agent Chat is only capable of a higher level quick POC,
-recently Agent Chat has become so popular and powerful that it is no less than AutoGen Core itself, and just to mention, it's AutoGen most populate design pattern called `megentic-Core` which was also referred a flagship AutoGen0.2 is now completely written using Agent Chat.
-
-point is, Agent Chat although being a higher level API on AutoGen Core is fully capable of delivering a great complex use case implementation.
-
-
-## Define AI Agent Chat Assistant Agent
-
-who, how this is not very much different than Agent Core at all,
-as I mentioned above Agent Chat provides preset Agent configuration which you can use.
-
-if you recall, in previous chapter, this was our Agent design pattern for the managing timesheets use case.
-
-TODO: mermaid agents for timesheet
-
-and we did implement PTO Agent and Task Agent, however, we didn't get a chance to complete other agents such LLMAgent.
-
-Now let;s implement this agent
+## State

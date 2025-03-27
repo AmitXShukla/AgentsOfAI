@@ -14,7 +14,7 @@ Grok's DeepSearch feature, part of the Grok 3 model developed by xAI, functions 
 
 ## Real life use cases
 
-### Monitoring Production Quality in a Factory
+### monitoring production quality in a factory
 
 In a bustling factory, an industrial-grade visual AI agent ensures that every product rolling off the assembly line meets rigorous quality standards. High-resolution cameras capture real-time images of items—such as car parts or electronics—as they travel along the conveyor belt. Trained on extensive datasets featuring both perfect products and defective ones (like misaligned screws or scratched surfaces), the AI leverages advanced computer vision and machine learning to detect flaws instantly. By analyzing these images continuously, the system flags faulty items for removal, guaranteeing that only top-quality goods move forward. Regular updates with fresh data keep the AI adaptable, allowing it to identify new types of defects and uphold exceptional production standards.
 
@@ -30,7 +30,7 @@ flowchart TD
     I -.-> C
 ```
 
-### Monitoring Hazards in Traffic
+### monitoring traffic hazards
 On busy roads, an industrial-grade visual AI agent enhances safety by vigilantly monitoring for potential hazards. Cameras mounted on vehicles or positioned along roadways capture real-time footage of the traffic environment. The AI, trained on vast datasets that include normal driving scenarios and dangerous situations—such as swerving vehicles or jaywalking pedestrians—employs sophisticated computer vision and machine learning to spot risks as they emerge. Upon detecting a hazard, the system promptly alerts drivers or traffic management systems, aiding in accident prevention. Continuous learning from new data ensures the AI remains effective, adapting to evolving risks and contributing to safer roads for all.
 
 ```{mermaid}

@@ -3,12 +3,15 @@
 Now since we have written many many tools, let's use these tools to LLM and ask questions.
 
 ```python
-tools = ["tool1", "tool2", "tool3", "tool4"]
+tools = ["get_pto_hours", "get_assignments", "get_manager_info"]
 response = ollama.chat(
         model='llama3.2',
-        messages=[{'role': 'user', 'content': 
-            'how old is Alice and how does she feels in San Francisco?'}],
-		    # provide a weather checking tool to the model
+        messages=[{'role': 'tool', 'content': 
+            """how many PTO Alice had taken in past two weeks and
+             how many projects are assigned to her, who is her manager?
+             """}],
+             ## refer to chapter: Tools -> More Tool Functions
+		    ## provide tool functions
         tools=tools # type: ignore
     )
 
@@ -37,20 +40,22 @@ So, how do we address this issue without compromising the core strengths of LLMs
 
 In short, the future of LLM tool-calling lies in intelligent management, not endless expansion. With the right approach, we can unlock their full potential without sacrificing flexibility.
 
-Just using tools and functions is not enough for professional software as a service (SaaS) solutions.
+Just using tools and functions is not enough for professional software as a service (SaaS) solutions design.
 
 ## Single AI Agent
 In software development, there are many ways to write code, known as programming paradigms.
 
 Some developers use object-oriented programming (OOP), where code is organized around objects that combine data and behavior. Others prefer functional programming, which focuses on pure functions and immutable data and some like Multiple Dispatch Type based programming.
 
-Additionally, certain languages offer duck typing—a dynamic typing feature that enhances flexibility by allowing objects to be used based on their capabilities rather than their explicit types. No single paradigm is universally best; each has unique strengths and weaknesses suited to different challenges.
+Additionally, certain languages offer duck typing—a dynamic typing feature that enhances flexibility by allowing objects to be used based on their capabilities rather than their explicit types. 
+
+No single paradigm is universally best; each has unique strengths and weaknesses suited to different challenges.
 
 These patterns make code more manageable, extensible, and clear.
 
 From a coder’s perspective, a frequent objective is to create software components that maintain their own state, process inputs, and interact with other components. This principle holds across paradigms and applications, whether building a simple module or a complex system.
 
-Now, consider an AI agent in this light: 
+> Now, consider an AI agent in this light:
 
 It’s a software entity like an Actor, designed to operate autonomously. An AI agent maintains its own state, perceives its environment (e.g., through messages or sensor inputs), and takes actions to achieve specific goals. These actions—such as updating its state, sending messages, executing code, or interacting with external systems—can influence both the agent and its surroundings. 
 
@@ -166,7 +171,7 @@ Let’s start by considering what we already know about large language models (L
 ```{note}
 For now, we don’t need to use fancy tools or programs like Agent Chat, Agent Studio, Open AI Swarm, MultiAgent, Magentic-core, AI Agents Single Chat, or MultiChat workflows—these are like design patterns, and we’ll keep it simple instead.
 
-Initially, we want to build one Simple AI Agent, You can always use AI Agent Chat quickly build an AI Agent, but Agent Chat is nothing but a preset AI Agents ready to use.
+Initially, we want to build one Simple AI Agent, You can always use AI Agent Chat to quickly build an AI Agent, but Agent Chat is nothing but a preset AI Agents ready to use.
 
 knowing AutoGen Core is important because it will help you understand and build own custom AI Agents, which are event-driven, distributed, scalable, resilient and you can run these agents locally on your sytem and will scale and move to a distributed platform when ready for deployment.
 ```

@@ -62,6 +62,39 @@ flowchart LR
     style Broadcast fill:#f1f8e9,stroke:#000
     style OtherAgents fill:#e0f7fa,stroke:#000
 ```
+`Solution Design : Implementation`
+
+```{mermaid}
+sequenceDiagram
+%% Adding a background box with light color
+    rect rgba(200, 212, 223, 0.8)
+        participant User
+        participant LLMAgent
+        participant PTOAgent
+        participant TaskAgent
+        participant HRAgent
+        participant DecisionAgent
+        participant ManagerAgent
+
+        User->>LLMAgent: PTO request (e.g., for Alice, ID:512, next Thu-Fri)
+        LLMAgent-->>LLMAgent: Identify dates and employee ID
+        LLMAgent->>PTOAgent: Send employee ID and dates
+        LLMAgent->>TaskAgent: Send employee ID and dates
+        PTOAgent->>HRAgent: Check sick leave rules
+        HRAgent-->>PTOAgent: Return policy info
+        PTOAgent->>DecisionAgent: Send PTO info
+        LLMAgent->>DecisionAgent: Send request details
+        DecisionAgent-->>DecisionAgent: Process information
+        alt Auto-approve
+            DecisionAgent->>User: PTO approved
+        else Send to manager
+            DecisionAgent->>ManagerAgent: Forward PTO request
+            ManagerAgent-->>ManagerAgent: Make decision
+            ManagerAgent->>DecisionAgent: Return decision
+            DecisionAgent->>User: PTO decision
+        end
+    end
+```
 
 ## Routed Agent
 ```python
@@ -108,10 +141,11 @@ RoutedAgent.__dict__
 ```python
 from autogen_core import RoutedAgent
 
-class TaskAgent(RoutedAgent):
+class TaskAgent(RoutedAgent): ## change Agent Name
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPTaskAgent")
 
+    ## add methods
     def do_something(self, message: str) -> None: ## Refactor
         # fetches tasks an employee        ## Refactor
         print(f"received message: {message}") ## Refactor
@@ -132,7 +166,7 @@ from autogen_core import RoutedAgent
 
 class LLMAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPLLMAgent")
 
     def do_something(self, message: str) -> None:
         # figure out Thursday and Friday date
@@ -153,7 +187,7 @@ class LLMAgent(RoutedAgent):
 
 class ManagerAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPMgrAgent")
 
     def do_something(self, message: str) -> None:
         # approve or disapprove PTO
@@ -165,7 +199,7 @@ class ManagerAgent(RoutedAgent):
 
 class BroadcasterAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("PTOAgent")
+        super().__init__("ERPBrdAgent")
 
     def do_something(self, message: str) -> None:
         # notify all employee that Susan is taking PTO

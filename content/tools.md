@@ -123,7 +123,8 @@ import ollama
 
 response = ollama.chat(
         model='llama3.2',
-        messages=[{'role': 'user', 'content': 
+        ## change 'role' : 'user' to 'tool'
+        messages=[{'role': 'tool', 'content': 
             """How is the weather in Los Angeles, CA today?"""}],
 		# REFACTOR: provide a weather checking tool to the model
         tools=tools # type: ignore

@@ -11,8 +11,8 @@ We explored the `runtime` environment, a system that lets programs run and suppo
 from autogen_core import RoutedAgent
 class PTOAgent(RoutedAgent):
     def __init__(self) -> None:
-        super().__init__("myPTOAgent")
-    @message_handler(match=lambda msg, ctx: msg.source.startswith("Agent_1"))
+        super().__init__("ERPPTOAgent")
+    @message_handler(match=lambda msg, ctx: msg.source.startswith("Manager"))
         async def on_txt_message_1(self, message: PTOAgentMessages, ctx: MessageContext) -> None:
             # fetches available PTO for a given employee
             ## added agent ID
@@ -75,7 +75,7 @@ If it’s not needed, it just stays idle.
 
 If you want to reuse an agent like `PTOAgent` for various tasks without registering it repeatedly (e.g., `runtime.register("PTOAgent")` for each use), you can register an AgentType instead. This approach is more efficient and flexible.
 
-Agent Type is not same as Agent class. In this above example, `PTOAgent` is an Agent class (Python class), initializing it with the name `myPTOAgent`.
+Agent Type is not same as Agent class. In this above example, `PTOAgent` is an Agent class (Python class), initializing it with the name `ERPPTOAgent`.
 
 **So what is the Agent Type?**
 
@@ -91,9 +91,9 @@ The job of Agent Type is to provide an instance of Python Agent class given a sp
       def handle_pto(self):
           print("Processing PTO request")
   ```
-  You can create an instance of it, like `myPTOAgent = PTOAgent()`.
+  You can create an instance of it, like `ERPPTOAgent = PTOAgent()`.
 
-- **Agent Instance**: A specific object made from the agent class (e.g., `myPTOAgent`).
+- **Agent Instance**: A specific object made from the agent class (e.g., `ERPPTOAgent`).
 
 - **Agent Type**: A factory function that creates instances of the agent class. It’s not the class itself but a way to produce agents on demand. For example:
   ```python
@@ -102,7 +102,7 @@ The job of Agent Type is to provide an instance of Python Agent class given a sp
   ```
 
 ### What’s the Point of `AgentType`?
-Instead of registering every agent instance individually (e.g., `runtime.register(myPTOAgent)`), you register the `AgentType`—the factory function. The runtime can then call this function whenever it needs a new agent of that type. This makes it easy to create multiple agents of the same kind without redundant registrations.
+Instead of registering every agent instance individually (e.g., `runtime.register(ERPPTOAgent)`), you register the `AgentType`—the factory function. The runtime can then call this function whenever it needs a new agent of that type. This makes it easy to create multiple agents of the same kind without redundant registrations.
 
 ### Example in Action
 Here’s how it works:
@@ -172,13 +172,13 @@ from autogen_core import SingleThreadedAgentRuntime
 runtime = SingleThreadedAgentRuntime()
 
 # attach/register AI Agent to run time
-await PTOAgent.register(runtime, "ERP_PTO_Agent", lambda: PTOAgent("T_E_PTOAgent"))
-await TaskAgent.register(runtime, "ERP_Task_Agent", lambda: TaskAgent("T_E_TaskAgent"))
+await PTOAgent.register(runtime, "AgType_ERP_PTO_Agent", lambda: PTOAgent())
+await TaskAgent.register(runtime, "AgType_ERP_Task_Agent", lambda: TaskAgent())
 ```
 
 ```{seealso} result
-    AgentType(type='PTOAgent')
-    AgentType(type='TaskAgent')
+    AgentType(type='AgType_ERP_PTO_Agent')
+    AgentType(type='AgType_ERP_Task_Agent')
 ```
 
 ```{note} note
@@ -196,18 +196,22 @@ After registering an agent, you can message an `Agent` instance using its `Agent
 
 ```python
 runtime.start()  # Start processing messages in the background.
-await runtime.send_message(MyMessageType("Hello, World!"), AgentId("my_agent", "default"))
-await runtime.send_message(MyMessageType("Hello, World!"), AgentId("my_assistant", "default"))
-await runtime.stop()  # Stop processing messages in the background.
+await runtime.send_message(PTOAgentMessages("Query PTOs taken by Employee ID 512 in past 2 weeks.", "Employee"), AgentId("AgType_ERP_PTO_Agent", "default"))
+await runtime.send_message(PTOAgentMessages("Query PTOs taken by Employee ID 512 in past 2 weeks", "Manager"), AgentId("AgType_ERP_PTO_Agent", "default"))
+await runtime.send_message(TaskAgentMessages("I need a list of all tasks assigned!", "Employee"), AgentId("AgType_ERP_Task_Agent", "default"))
+await runtime.send_message(TaskAgentMessages("I need a list of all tasks assigned!", "Manager"), AgentId("AgType_ERP_Task_Agent", "default"))
 ```
 
 ```{seealso} result
-    my_agent received message: Hello, World!
-    my_assistant received message: Hello, World!
-    my_assistant responded: Hello! How can I assist you today?
+    AgType_ERP_PTO_Agent received message: Query PTOs taken by Employee ID 512 in past 2 weeks. from : Employee
+    AgType_ERP_PTO_Agent received message: Query PTOs taken by Employee ID 512 in past 2 weeks from : Manager
+    AgType_ERP_Task_Agent received message: I need a list of all tasks assigned! from : Employee
+    AgType_ERP_Task_Agent received message: I need a list of all tasks assigned! from : Manager
 ```
 
 ```python
+# Stop processing messages in the background.
+await runtime.stop()
 # This will block until the runtime is idle
 await runtime.stop_when_idle()
 # This will close the runtime
